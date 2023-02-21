@@ -1,16 +1,21 @@
 package application;
 
 import org.apache.commons.lang3.StringUtils;
+import org.tinylog.Logger;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /** 학교 이름의 반복 횟수를 카운트 합니다. */
 public class SchoolNameRepetitionCounter {
+
+    private final Pattern pattern = Pattern.compile("\\b[가-힣a-zA-Z]+( |)+학교");
 
     private final CommentPreparer preparer;
 
@@ -30,10 +35,22 @@ public class SchoolNameRepetitionCounter {
             List<String> comments,
             List<String> schools
     ) {
-        return comments.parallelStream()
+        Logger.info("댓글 리스트에서 유효한 학교명을 카운트 합니다.");
+        Logger.info("댓글 총 갯수: {}", comments.size());
+
+        Map<Boolean, List<String>> result = comments.parallelStream()
                 .map(preparer::replaceForSearch)
                 .map((it) -> findSchoolName(schools, it))
-                .filter(Objects::nonNull)
+                .collect(
+                        Collectors.partitioningBy(Objects::nonNull)
+                );
+
+        List<String> validComments = result.get(true);
+        Logger.info("유효한 학교명을 포함한 댓글 갯수: {}", validComments.size());
+        List<String> invalidComments = result.get(false);
+        Logger.info("유효한 학교명을 찾지 못한 댓글 갯수: {}", invalidComments.size());
+
+        return validComments.parallelStream()
                 .collect(
                         Collectors.groupingBy(
                                 Function.identity(),
@@ -56,7 +73,15 @@ public class SchoolNameRepetitionCounter {
                         containsAny(comments, school)
                 )
                 .findFirst()
-                .orElse(null);
+                .orElseGet(() -> {
+                    String match = matchSchoolPostfix(comments[0]);
+                    if (match == null) {
+                        Logger.warn("-------------------------------------");
+                        Logger.warn("댓글에서 유효한 학교명을 찾지 못했습니다.\n{}", comments[0]);
+                        return null;
+                    }
+                    return match;
+                });
     }
 
     /**
@@ -67,7 +92,8 @@ public class SchoolNameRepetitionCounter {
      * @return 포함하고 있는 문자열을 하나라도 찾으면 true, 없으면 false
      */
     private boolean containsAny(String[] targets, String searchText) {
-        return Arrays.stream(targets).anyMatch(comment -> contains(comment, searchText));
+        return Arrays.stream(targets)
+                .anyMatch(comment -> contains(comment, searchText));
     }
 
     /**
@@ -79,5 +105,22 @@ public class SchoolNameRepetitionCounter {
      */
     private boolean contains(String target, String searchText) {
         return StringUtils.contains(target, searchText);
+    }
+
+    /**
+     * 학교 이름 리스트에서 일치하는 학교명을 발견하지 못했으나,
+     * 정확히 '학교'라고 입력한 경우를 정규식으로 찾아 반환합니다.
+     *
+     * @param target 정규식으로 검사할 대상 문자열
+     * @return 정규식으로 찾은 학교가 포함된 부분
+     *         찾지 못한 경우는 null을 반환합니다.
+     */
+    private String matchSchoolPostfix(String target) {
+        Matcher matcher = pattern.matcher(target);
+        if (matcher.find()
+                && StringUtils.deleteWhitespace(matcher.group()).length() > 4) {
+            return matcher.group();
+        }
+        return null;
     }
 }
