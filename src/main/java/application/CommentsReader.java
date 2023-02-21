@@ -27,8 +27,9 @@ public class CommentsReader {
             return StreamSupport.stream(
                             csvReader.read(FILE_NAME)
                                     .spliterator(),
-                            true
-                    ).map(record -> record.get(0))
+                            false
+                    ).skip(1)
+                    .map(record -> record.get(0))
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
