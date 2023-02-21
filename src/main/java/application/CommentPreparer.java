@@ -29,6 +29,7 @@ public class CommentPreparer {
     public String[] replaceForSearch(String originalText) {
         String removedText = removeUnnecessaryCharacters(originalText);
         return new String[] {
+                originalText,
                 replaceEach(removedText, ELEMENT_SCHOOL_REPLACES),
                 replaceEach(removedText, MIDDLE_SCHOOL_REPLACES),
                 replaceEach(removedText, HIGH_SCHOOL_REPLACES),
