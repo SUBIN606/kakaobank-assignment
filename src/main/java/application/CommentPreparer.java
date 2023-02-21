@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 public class CommentPreparer {
 
     private static final String REGEX = "[^가-힣a-zA-Z]";
-    private static final String REPLACE_EMPTY = "";
     private static final String[][] ELEMENT_SCHOOL_REPLACES = {
             {"초"},
             {"초등학교"}
@@ -44,7 +43,7 @@ public class CommentPreparer {
      * @return 한글 혹은 영문자를 제외한 모든 문자열이 제거된 문자열
      */
     private String removeUnnecessaryCharacters(String originalText) {
-        return RegExUtils.replaceAll(originalText, REGEX, REPLACE_EMPTY);
+        return RegExUtils.replaceAll(originalText, REGEX, StringUtils.EMPTY);
     }
 
     /**
