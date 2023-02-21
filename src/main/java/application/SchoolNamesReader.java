@@ -2,6 +2,7 @@ package application;
 
 import fileutils.CsvReader;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -22,12 +23,17 @@ public class SchoolNamesReader {
      * @return 학교 리스트
      */
     public List<String> read() {
-        return StreamSupport.stream(
-                csvReader.read(FILE_NAME)
-                        .spliterator(),
-                        true
-                ).skip(1)
-                .map(record -> record.get(0))
-                .toList();
+        try {
+            return StreamSupport.stream(
+                    csvReader.read(FILE_NAME)
+                            .spliterator(),
+                            true
+                    ).skip(1)
+                    .map(record -> record.get(0))
+                    .toList();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }

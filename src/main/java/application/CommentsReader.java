@@ -2,6 +2,7 @@ package application;
 
 import fileutils.CsvReader;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -22,11 +23,15 @@ public class CommentsReader {
      * @return 댓글 리스트
      */
     public List<String> read() {
-        return StreamSupport.stream(
-                        csvReader.read(FILE_NAME)
-                                .spliterator(),
-                        true
-                ).map(record -> record.get(0))
-                .toList();
+        try {
+            return StreamSupport.stream(
+                            csvReader.read(FILE_NAME)
+                                    .spliterator(),
+                            true
+                    ).map(record -> record.get(0))
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
