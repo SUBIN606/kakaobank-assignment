@@ -25,16 +25,11 @@ public class CsvReader {
      * @param fileName csv 파일명
      * @return csv 파일 내용
      */
-    public Iterable<CSVRecord> read(String fileName) {
-        try {
-            Reader reader = new FileReader(
-                    getPath(fileName)
-            );
-            return csvFormat.parse(reader);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+    public Iterable<CSVRecord> read(String fileName) throws IOException {
+        Reader reader = new FileReader(
+                getPath(fileName)
+        );
+        return csvFormat.parse(reader);
     }
 
     /** 파일의 path 반환 */
