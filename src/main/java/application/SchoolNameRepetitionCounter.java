@@ -75,12 +75,12 @@ public class SchoolNameRepetitionCounter {
                 .findFirst()
                 .orElseGet(() -> {
                     String match = matchSchoolPostfix(comments[0]);
-                    if (match == null) {
-                        Logger.warn("-------------------------------------");
-                        Logger.warn("댓글에서 유효한 학교명을 찾지 못했습니다.\n{}", comments[0]);
-                        return null;
+                    Logger.warn("-".repeat(50));
+                    Logger.warn("아래 댓글에서 유효한 학교명을 찾지 못했습니다.\n{}", comments[0]);
+                    if (match != null) {
+                        Logger.warn("학교 이름으로 추정되는 문자열이 있습니다. : {}", match);
                     }
-                    return match;
+                    return null;
                 });
     }
 
