@@ -60,13 +60,13 @@ class SchoolNameRepetitionCounterTest {
                     "카뱅고등학교"
             );
 
-            @DisplayName("카운트 한다")
+            @DisplayName("카운트 대상에서 제외 한다")
             @Test
             void it_returns_count_postfix_matched_word() {
                 Map<String, Long> result = counter.countSchoolNameRepetitions(comments, schools);
 
                 assertThat(result).isNotEmpty();
-                assertThat(result.get("아무개중학교")).isEqualTo(1);
+                assertThat(result.get("아무개중학교")).isEqualTo(null);
                 assertThat(result.get("카뱅고등학교")).isEqualTo(1);
             }
         }
