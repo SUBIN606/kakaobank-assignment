@@ -72,7 +72,10 @@ public class SchoolNameRepetitionCounter {
                 .filter(school ->
                         containsAny(comments, school)
                 )
-                .findFirst()
+                .peek(it -> {
+                    Logger.debug("유효한 학교 이름 발견: {}", it);
+                    Logger.debug(comments[0]);
+                }).findFirst()
                 .orElseGet(() -> {
                     String match = matchSchoolPostfix(comments[0]);
                     Logger.warn("-".repeat(50));
