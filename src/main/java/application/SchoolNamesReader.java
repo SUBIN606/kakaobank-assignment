@@ -1,10 +1,12 @@
 package application;
 
 import fileutils.CsvReader;
+import org.apache.commons.csv.CSVFormat;
+import org.tinylog.Logger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 /** 학교 목록이 담긴 csv 파일을 읽습니다. */
 public class SchoolNamesReader {
@@ -24,15 +26,16 @@ public class SchoolNamesReader {
      */
     public List<String> read() {
         try {
-            return StreamSupport.stream(
-                    csvReader.read(FILE_NAME)
-                            .spliterator(),
-                            true
-                    ).skip(1)
-                    .map(record -> record.get(0))
-                    .toList();
+            List<String> schools = new ArrayList<>();
+
+            Logger.info("학교 이름 리스트 파일 읽기를 시작합니다.");
+            csvReader.read(FILE_NAME)
+                    .forEach(record ->
+                            schools.add(record.get(0)));
+            Logger.info("학교 이름 리스트 파일 읽기를 완료했습니다.");
+
+            return schools;
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
