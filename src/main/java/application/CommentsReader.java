@@ -1,10 +1,11 @@
 package application;
 
 import fileutils.CsvReader;
+import org.tinylog.Logger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 /** 댓글 목록이 담긴 csv 파일을 읽습니다. */
 public class CommentsReader {
@@ -24,13 +25,14 @@ public class CommentsReader {
      */
     public List<String> read() {
         try {
-            return StreamSupport.stream(
-                            csvReader.read(FILE_NAME)
-                                    .spliterator(),
-                            false
-                    ).skip(1)
-                    .map(record -> record.get(0))
-                    .toList();
+            List<String> comments = new ArrayList<>();
+
+            Logger.info("댓글리스트 파일 읽기를 시작합니다.");
+            csvReader.read(FILE_NAME)
+                    .forEach(record -> comments.add(record.get(0)));
+            Logger.info("댓글리스트 파일 읽기를 완료했습니다.");
+
+            return comments;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
