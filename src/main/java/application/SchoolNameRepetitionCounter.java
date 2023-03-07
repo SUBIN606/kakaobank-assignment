@@ -50,7 +50,7 @@ public class SchoolNameRepetitionCounter {
         List<String> invalidComments = result.get(false);
         Logger.info("유효한 학교명을 찾지 못한 댓글 갯수: {}", invalidComments.size());
 
-        return validComments.parallelStream()
+        return validComments.stream()
                 .collect(
                         Collectors.groupingBy(
                                 Function.identity(),
@@ -68,14 +68,16 @@ public class SchoolNameRepetitionCounter {
      * @return 댓글에서 찾은 학교 이름. 찾지 못하면 null 반환
      */
     private String findSchoolName(List<String> schools, String[] comments) {
-        return schools.parallelStream()
+        return schools.stream()
                 .filter(school ->
                         containsAny(comments, school)
                 )
                 .peek(it -> {
+                    Logger.debug("------");
                     Logger.debug("유효한 학교 이름 발견: {}", it);
                     Logger.debug(comments[0]);
-                }).findFirst()
+                })
+                .findFirst()
                 .orElseGet(() -> {
                     String match = matchSchoolPostfix(comments[0]);
                     Logger.warn("-".repeat(50));
@@ -88,7 +90,7 @@ public class SchoolNameRepetitionCounter {
     }
 
     /**
-     * 문자열 배열에서 찾고자하는 문자열을 포함 여부를 반환합니다.
+     * 문자열 배열에서 찾고자하는 문자열의 포함 여부를 반환합니다.
      *
      * @param targets 대상 문자열이 담긴 배열
      * @param searchText 찾고자하는 문자열
